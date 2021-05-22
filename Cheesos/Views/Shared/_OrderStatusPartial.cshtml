@@ -1,0 +1,20 @@
+﻿@model string
+@using Cheesos.Utility
+
+<div style="width:100%">
+    @switch (Model)
+    {
+        case SD.StatusSubmitted:
+            <img src="~/images/OrderPlaced.png" alt="Order Placed" />
+            break;
+        case SD.StatusInProcess:
+            <img src="~/images/InKitchen.png" alt="Being Prepared" />
+            break;
+        case SD.StatusReady:
+            <img src="~/images/ReadyForPickup.png" alt="Ready for Pickup" />
+            break;
+        case SD.StatusCompleted:
+            <img src="~/images/completed.png" alt="Completed" />
+            break;
+    }
+</div>

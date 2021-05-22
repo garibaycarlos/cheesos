@@ -1,0 +1,67 @@
+﻿@model IEnumerable<ApplicationUser>
+
+@{
+    ViewData["Title"] = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<br />
+<br />
+<div class="border background-white">
+    <div class="row">
+        <div class="col-6">
+            <h2 class="text-info">Users List</h2>
+        </div>
+        <div class="col-6 text-right">
+            <a asp-area="Identity" asp-page="/Account/Register" class="btn btn-info"><i class="fas fa-plus"></i>&nbsp; New Exployee Registration</a>
+        </div>
+    </div>
+    <br />
+    <div>
+        @if (Model.Count() > 0)
+        {
+            <table class="table table-striped border">
+                <tr class="table-secondary">
+                    <th>
+                        @Html.DisplayNameFor(m => m.Name)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(m => m.Email)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(m => m.PhoneNumber)
+                    </th>
+                    <th></th>
+                    <th></th>
+                </tr>
+                @foreach (ApplicationUser applicationUser in Model)
+                {
+                    <tr>
+                        <td>
+                            @Html.DisplayFor(m => applicationUser.Name)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(m => applicationUser.Email)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(m => applicationUser.PhoneNumber)
+                        </td>
+                        <td>
+                            @{
+                                bool lockUser = (applicationUser.LockoutEnd == null || applicationUser.LockoutEnd < DateTime.Now ? true : false);
+                                string color = (lockUser ? "success" : "danger");
+                                string icon = (lockUser ? "fa-lock-open" : "fa-lock");
+
+                            }
+                            <a class="btn btn-@color text-white" asp-action="LockUnlock" asp-route-id="@applicationUser.Id" asp-route-lockUser="@lockUser"><i class="fas @icon"></i></a>
+                        </td>
+                    </tr>
+                }
+            </table>
+        }
+        else
+        {
+            <p>No User exists.</p>
+        }
+    </div>
+</div>

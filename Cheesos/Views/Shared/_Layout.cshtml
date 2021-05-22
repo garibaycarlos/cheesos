@@ -1,0 +1,117 @@
+﻿@using Cheesos.Utility
+@using Microsoft.AspNetCore.Http
+@inject IHttpContextAccessor HttpContextAccessor
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Cheesos</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" />
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.5.0/css/all.css" />
+    <link rel="stylesheet" href="~/css/jqueryui/jquery-ui.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-timepicker/1.13.18/jquery.timepicker.css" integrity="sha512-GgUcFJ5lgRdt/8m5A0d0qEnsoi8cDoF0d6q+RirBPtL423Qsj5cI9OxQ5hWvPi5jjvTLM/YhaaFuIeWCLi6lyQ==" crossorigin="anonymous" />
+</head>
+
+<body class="search-background">
+    <header>
+        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-dark bg-dark border-bottom box-shadow mb-3">
+            <div class="container">
+                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">
+                    <img src="~/images/mild.png" />
+                    <img src="~/images/spicy.png" />
+                    <img src="~/images/verySpicy.png" />
+                    <label class="text-info" style="cursor:pointer;">Cheesos</label>
+                </a>
+                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target=".navbar-collapse"
+                        aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
+                    <ul class="navbar-nav flex-grow-1">
+                        @if (User.IsInRole(SD.ManagerUser))
+                        {
+                            <li class="nav-item dropdown text-white-50">
+                                <a class="nav-link dropdown-toggle" href="#" id="navBarDropDownMenuLink" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                    Content Management
+                                </a>
+                                <div class="dropdown-menu" aria-labelledby="navBarDropDownMenuLink">
+                                    <a class="dropdown-item" asp-area="Admin" asp-controller="Category" asp-action="Index">Category</a>
+                                    <a class="dropdown-item" asp-area="Admin" asp-controller="SubCategory" asp-action="Index">Sub Category</a>
+                                    <a class="dropdown-item" asp-area="Admin" asp-controller="MenuItem" asp-action="Index">Menu Item</a>
+                                    <a class="dropdown-item" asp-area="Admin" asp-controller="Coupon" asp-action="Index">Coupons</a>
+                                    <a class="dropdown-item" asp-area="Admin" asp-controller="User" asp-action="Index">Users</a>
+                                </div>
+                            </li>
+                        }
+
+                        @if (User.IsInRole(SD.ManagerUser) || User.IsInRole(SD.CustomerEndUser) || User.IsInRole(SD.FrontDeskUser) || User.IsInRole(SD.KitchenUser))
+                        {
+                            <li class="nav-item">
+                                <a asp-area="Customer" asp-controller="Order" asp-action="OrderHistory" class="nav-link">
+                                    Order History
+                                </a>
+                            </li>
+                        }
+
+                        @if (User.IsInRole(SD.FrontDeskUser) || User.IsInRole(SD.KitchenUser) || User.IsInRole(SD.ManagerUser))
+                        {
+                            <li class="nav-item dropdown text-white-50">
+                                <a class="nav-link dropdown-toggle" href="#" id="navBarDropDown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                    Order
+                                </a>
+                                <div class="dropdown-menu" aria-labelledby="navBarDropDownMenuLink">
+                                    @if (User.IsInRole(SD.KitchenUser) || User.IsInRole(SD.ManagerUser))
+                                    {
+                                        <a class="dropdown-item" asp-area="Customer" asp-controller="Order" asp-action="ManageOrder">Manage Order</a>
+                                    }
+                                    @if (User.IsInRole(SD.FrontDeskUser) || User.IsInRole(SD.ManagerUser))
+                                    {
+                                        <a class="dropdown-item" asp-area="Customer" asp-controller="Order" asp-action="OrderPickup">Order Pickup</a>
+                                    }
+                                </div>
+                            </li>
+                        }
+
+                        @{
+                            int? cartCount = 0;
+                        }
+
+                        @if (HttpContextAccessor.HttpContext.Session.GetInt32(SD.ssShoppingCartCount) != null)
+                        {
+                            cartCount = HttpContextAccessor.HttpContext.Session.GetInt32(SD.ssShoppingCartCount);
+                        }
+
+                        <li style="color:white;">
+                            <a asp-area="Customer" asp-controller="Cart" asp-action="Index" class="nav-link">
+                                <i class="fas fa-shopping-cart"></i>&nbsp; (@cartCount)
+                            </a>
+                        </li>
+                    </ul>
+                    <partial name="_LoginPartial" />
+                </div>
+            </div>
+        </nav>
+    </header>
+    <div class="container">
+        <main role="main" class="pb-3">
+            @RenderBody()
+        </main>
+    </div>
+
+    <footer class="border-top pl-3 footer text-white-50" style="background-color:#343a40">
+        <div class="container">
+            &copy; 2021 - Cheesos
+        </div>
+    </footer>
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    <script src="~/js/jqueryui/jquery-ui.js"></script>
+    <script src="https://cdn.tiny.cloud/1/qkf5ihf7r5pvsbuq7184hef84b8aoxgxfepkkmq968rzr1yb/tinymce/5/tinymce.min.js" referrerpolicy="origin"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

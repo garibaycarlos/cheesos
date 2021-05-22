@@ -1,0 +1,79 @@
+﻿@model Cheesos.Models.ViewModels.IndexViewModel
+
+<br />
+
+@if (Model.Coupon.Count() > 0)
+{
+    <div class="border">
+        <div class="carousel" data-ride="carousel" data-interval="2500">
+            @for (int i = 0; i < Model.Coupon.Count(); i++)
+            {
+                if (i == 0)
+                {
+                    <div class="carousel-item active">
+                        @{
+                            string base64 = Convert.ToBase64String(Model.Coupon.ToList()[i].Picture);
+                            string imgSrc = string.Format("data:image/jpg;base64,{0}", base64);
+                        }
+                        <img src="@imgSrc" class="d-block w-100" style="height:50px;" />
+                    </div>
+                }
+                else
+                {
+                    <div class="carousel-item">
+                        @{
+                            string base64 = Convert.ToBase64String(Model.Coupon.ToList()[i].Picture);
+                            string imgSrc = string.Format("data:image/jpg;base64,{0}", base64);
+                        }
+                        <img src="@imgSrc" class="d-block w-100" style="height:50px;" />
+                    </div>
+                }
+            }
+        </div>
+    </div>
+}
+
+<br />
+<br />
+<div class="p-4"></div>
+<div class="background-white container">
+    <ul id="menu-filters" class="menu-filter-list list-inline text-center">
+        <li class="active btn btn-secondary ml-1 mr-1" data-filter=".menu-restaurant">Show All</li>
+
+        @foreach (Category category in Model.Category)
+        {
+            <li class="ml-1 mr-1" data-filter=".@category.Name.Replace(" ", string.Empty)">@category.Name</li>
+        }
+    </ul>
+
+    @foreach (var category in Model.Category)
+    {
+        <div class="row" id="menu-wrapper">
+            <partial name="_ThumbnailAreaPartial" model="@Model.MenuItem.Where(u=>u.Category.Name.Equals(category.Name))" />
+        </div>
+    }
+</div>
+@section Scripts{
+    <script>
+        let posts = $('.post');
+
+        (function ()
+        {
+            $('#menu-filters li').click(function ()
+            {
+                $('#menu-filters li').removeClass('active btn btn-secondary');
+
+                $(this).addClass('active btn btn-secondary');
+
+                let selectedFilter = $(this).data('filter');
+
+                $('.menu-restaurant').fadeOut();
+
+                setTimeout(function ()
+                {
+                    $(selectedFilter).slideDown();
+                }, 300);
+            });
+        })(jQuery);
+    </script>
+}

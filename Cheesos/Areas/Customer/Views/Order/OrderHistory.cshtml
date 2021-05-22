@@ -1,0 +1,177 @@
+﻿@model Cheesos.Models.ViewModels.OrderListViewModel
+@using Cheesos.Utility
+@{
+    ViewData["Title"] = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<br />
+<br />
+<div class="border background-white">
+    <div class="row">
+        <div class="col-6">
+            <h2 class="text-info">Past Order List</h2>
+        </div>
+    </div>
+    <br />
+    <div>
+        @if (Model.Orders.Count() > 0)
+        {
+            <table class="table table-striped border">
+                <tr class="table-secondary">
+                    <th>
+                        @Html.DisplayNameFor(m => m.Orders[0].OrderHeader.Id)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(m => m.Orders[0].OrderHeader.PickupName)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(m => m.Orders[0].OrderHeader.ApplicationUser.Email)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(m => m.Orders[0].OrderHeader.PickupTime)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(m => m.Orders[0].OrderHeader.OrderTotal)
+                    </th>
+                    <th>
+                        Total Items
+                    </th>
+                    <th></th>
+                </tr>
+                @foreach (var item in Model.Orders)
+                {
+                    <tr>
+                        <td>
+                            @Html.DisplayFor(m => item.OrderHeader.Id)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(m => item.OrderHeader.ApplicationUser.Name)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(m => item.OrderHeader.ApplicationUser.Email)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(m => item.OrderHeader.PickupTime)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(m => item.OrderHeader.OrderTotal)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(m => item.OrderDetails.Count)
+                        </td>
+                        <td>
+                            <button type="submit" class="btn btn-success anchor-detail" data-id="@item.OrderHeader.Id" data-toggle="modal">
+                                <i class="far fa-list-alt">&nbsp;Details</i>
+                            </button>
+                            @if (item.OrderHeader.Status != SD.StatusCanceled)
+                            {
+                                <button type="submit" class="btn btn-info anchor-status" data-id="@item.OrderHeader.Id" data-toggle="modal">
+                                    <i class="far fa-clock">&nbsp;Status</i>
+                                </button>
+                            }
+                        </td>
+                    </tr>
+                }
+            </table>
+            //
+            <div page-model="Model.PagingInfo" page-classes-enabled="true" page-class="btn border" page-class-normal="btn btn-light"
+                 page-class-selected="btn btn-info active" class="btn-group float-right">
+            </div>
+            <br />
+        }
+        else
+        {
+            <p>No Order exists.</p>
+        }
+    </div>
+</div>
+
+<div class="modal fade" id="modalOrderDetails" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog-centered modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header bg-success text-light justify-content-center">
+                <h5 class="modal-title">Order Details</h5>
+            </div>
+            <div class="modal-body justify-content-center" id="modalOrderDetailsContent">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" style="width:20%;" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="modalOrderStatus" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog-centered modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header bg-info text-light justify-content-center">
+                <h5 class="modal-title">Order Status</h5>
+            </div>
+            <div class="modal-body justify-content-center" id="modalOrderStatusContent">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" style="width:20%;" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts
+{
+    <script>
+        let orderDetailsPostbackURL = '/Customer/Order/GetOrderDetails';
+        let orderStatusPostbackURL = '/Customer/Order/GetOrderStatus';
+
+        $(function ()
+        {
+            $('.anchor-detail').click(function ()
+            {
+                let $buttonClicked = $(this);
+                let id = $buttonClicked.attr('data-id');
+
+                $.ajax(
+                    {
+                        type: 'GET',
+                        url: orderDetailsPostbackURL,
+                        contentType: 'application/json; charset=utf-8',
+                        data: { 'id': id },
+                        cache: false,
+                        //dataType: 'json',
+                        success: function (data)
+                        {
+                            // pass the retrieved data from the call to the model content
+                            $('#modalOrderDetailsContent').html(data);
+
+                            $('#modalOrderDetails').modal('show');
+                        },
+                        error: function () { alert('Dynamic content load failed') }
+                    });
+            });
+
+            $('.anchor-status').click(function ()
+            {
+                let $buttonClicked = $(this);
+                let id = $buttonClicked.attr('data-id');
+
+                $.ajax(
+                    {
+                        type: 'GET',
+                        url: orderStatusPostbackURL,
+                        contentType: 'application/json; charset=utf-8',
+                        data: { 'id': id },
+                        cache: false,
+                        //dataType: 'json',
+                        success: function (data)
+                        {
+                            // pass the retrieved data from the call to the model content
+                            $('#modalOrderStatusContent').html(data);
+
+                            $('#modalOrderStatus').modal('show');
+                        },
+                        error: function () { alert('Dynamic content load failed') }
+                    });
+            });
+        });
+    </script>
+}
